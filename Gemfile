@@ -27,7 +27,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'bcrypt', '~> 3.1.7'
 
 # Use Puma as the app server
-gem 'puma'
+gem 'puma', '~>3.8.2'
 
 # For REST stuff
 gem 'rest-client'
