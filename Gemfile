@@ -32,6 +32,9 @@ gem 'puma', '~>3.8.2'
 # For REST stuff
 gem 'rest-client'
 
+# For midterm texting app
+gem 'twilio-ruby'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
