@@ -16,9 +16,11 @@ class StaticPagesController < ApplicationController
   			:body => @body
 		})
 	end
+	def update
+	end
 	def access
 		if params['key'] == 'supersecretpasswordgoeshere'
-			render plain: '11110000', status: 202 and return
+			render plain: '11100100', status: 202 and return
 		else
 			render plain: 'INVALID', status: 400 and return
 		end
