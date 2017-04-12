@@ -17,6 +17,10 @@ class StaticPagesController < ApplicationController
 		})
 	end
 	def access
-		render plain: '11110000'
+		if params['key'] == 'supersecretpasswordgoeshere'
+			render plain: '11110000', status: 200 and return
+		else
+			render plain: 'INVALID', status: 400 and return
+		end
 	end
 end
