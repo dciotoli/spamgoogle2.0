@@ -16,4 +16,7 @@ class StaticPagesController < ApplicationController
   			:body => @body
 		})
 	end
+	def access
+		render plain: '11110000'
+	end
 end
