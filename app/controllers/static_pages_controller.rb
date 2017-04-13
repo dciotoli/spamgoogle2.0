@@ -17,6 +17,14 @@ class StaticPagesController < ApplicationController
 		})
 	end
 	def update
+		if params['old'] == Code.first.data
+			Code.first.update!(data: params['new'])
+			render plain: "New code is: #{params['new']}" and return
+		else
+			render plain: "Old code is incorrect" and return
+		end
+	rescue => e
+		render plain: e.message and return
 	end
 	def access
 		if params['key'] == 'supersecretpasswordgoeshere'

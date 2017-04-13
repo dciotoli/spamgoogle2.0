@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get 'index' => 'static_pages#index'
   get 'twilio' => 'static_pages#twilio'
   get 'access' => 'static_pages#access'
+  get 'update' => 'static_pages#update'
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
