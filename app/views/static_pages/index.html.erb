@@ -6,10 +6,17 @@
 	</div>
 	<div class="row">
 		<div id="map"></div>
+		<form action="calculateAndDisplayRoute">
+  Start Location: <input type="text" name="fname"><br>
+  Destination: <input type="text" name="lname"><br>
+  <input type="submit" value="Submit">
+</form>
 	</div>
 
 	<script>
 	var map;
+	var directionsServices;
+	car directionsDisplay;
 	function getLocation() {
 	    if (navigator.geolocation) {
 	        navigator.geolocation.getCurrentPosition(initMap);
@@ -19,10 +26,10 @@
 	}
 
     function initMap(position) {
-				var directionsServices= new google.maps.DirectionsServices;
-				var directionsDisplay= new google.maps.DirectionsRenderer;
+				directionsServices= new google.maps.DirectionsServices;
+				directionsDisplay= new google.maps.DirectionsRenderer;
         var uluru = {lat: position.coords.latitude, lng: position.coords.longitude};
-        var map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), {
           zoom: 18,
           center: uluru
         });
@@ -31,14 +38,9 @@
           map: map
         });
 				directionsDisplay.setMap(map);
-				var onChangeHandler = function() {
-				 calculateAndDisplayRoute(directionsService, directionsDisplay);
-			 };
-			 document.getElementById('start').addEventListener('change', onChangeHandler);
-			 document.getElementById('end').addEventListener('change', onChangeHandler);
       }
 
-		function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+		function calculateAndDisplayRoute() {
         directionsService.route({
           origin: document.getElementById('start').value,
           destination: document.getElementById('end').value,
