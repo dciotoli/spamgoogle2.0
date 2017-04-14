@@ -62,10 +62,58 @@
         directionsService.route({
           origin: start,
           destination: end,
-          travelMode: 'BICYCLING'
+          travelMode: 'BICYCLING',
+					provideRouteAlternatives: true
         }, function(response, status) {
           if (status === 'OK') {
-            directionsDisplay.setDirections(response);
+						var routesSteps=[];
+						var routes=response.routes;
+	          var colors = ['red', 'green', 'blue'];
+						for (var i=0;i<routes.length;i++){
+
+							directionsDisplay.setDirections(response);
+
+                new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: response,
+                    routeIndex: i,
+                    polylineOptions: {
+
+                        strokeColor: colors[i],
+                        strokeWeight: 4,
+                        strokeOpacity: .3
+                    }
+                });
+
+                var steps = routes[i].legs[0].steps;
+                var stepsCoords = [];
+
+                for (var j = 0; j < steps.length; j++) {
+
+                    stepsCoords[j] = new google.maps.LatLng(steps[j].start_location.lat(), steps[j].start_location.lng());
+
+                    new google.maps.Marker({
+                        position: stepsCoords[j],
+                        map: map,
+                        icon: {
+                            path: 'M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0',
+                            scale: .2,
+                            fillColor: colors[i],
+                            fillOpacity: .3,
+                            strokeWeight: 0
+                        },
+                        title: steps[j].maneuver
+                    });
+                }
+
+                routesSteps[i] = stepsCoords;
+
+						}
+						for(var x=0;x<routesSteps.length;x++){
+							for(var y=0;y<routesSteps[x].length;y++){
+								console.log(routesSteps[x][y].lat,routesSteps[x][y].lng);
+							}
+						}
           } else {
             window.alert('Directions request failed due to ' + status);
           }
