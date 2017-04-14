@@ -7,7 +7,10 @@
 	<div class="row">
 		<div id="map"></div>
 	</div>
-
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center">
+		</div>
+	</div>
 	<script>
 	var map;
 	function getLocation() {
@@ -42,7 +45,7 @@
         directionsService.route({
           origin: document.getElementById('start').value,
           destination: document.getElementById('end').value,
-          travelMode: 'DRIVING'
+          travelMode: 'BIKING'
         }, function(response, status) {
           if (status === 'OK') {
             directionsDisplay.setDirections(response);
@@ -54,4 +57,5 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5r5234G4KwLjTkmJ2Fa9y-8NkqavSjEM&callback=getLocation">
     </script>
+
 </div>
