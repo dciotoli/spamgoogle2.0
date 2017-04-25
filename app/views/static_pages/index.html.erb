@@ -43,7 +43,9 @@
 	}
 	function showElevation(elevations, status){
 		if(status!=='OK'){
-			document.getElementById('topography').appendChild(document.createElement("p").innerHTML=("Elevation Failed: "+status));
+			var error=document.createElement("p");
+			error.innerHTML = "elevation failed: "+status;
+			document.getElementById('topography').appendChild(error);
 			return;
 		}
 		var chartContainer = document.createElement("div");
