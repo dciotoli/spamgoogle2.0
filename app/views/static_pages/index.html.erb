@@ -21,7 +21,7 @@
 	<script src="https://www.google.com/jsapi"></script>
 	<script>
 
-	google.load('visualization', '1', {packages: ['corechart']});
+	google.load('visualization', '1', {packages: ['linechart']});
 
 	var map;
 	var directionsService;
@@ -33,7 +33,9 @@
 		initMap();
 	}
 	function getTopography(routes){
-		document.getElementById('topography').empty(); //Reset Div
+		while(document.getElementById("topography").firstChild) {
+    	document.getElementById("topography").removeChild(document.getElementById("topography").firstChild);
+		}
 		routes.forEach(function(route){
 			elevationService.getElevationAlongPath({
 				'path':route.overview_path,
