@@ -14,16 +14,56 @@
     </div>
 		<div id="directions">
 		</div>
+		<div id="topography">
+		</div>
 	</div>
 
+	<script src="https://www.google.com/jsapi"></script>
 	<script>
+
+	google.load('visualization', '1', {packages: ['corechart']});
+
 	var map;
 	var directionsService;
 	var directionsDisplay;
 	var currLocation;
+	var elevationService;
 	function saveLocation(position){
 		currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
 		initMap();
+	}
+	function getTopography(routes){
+		document.getElementById('topography').innerHTML = ""; //Reset Div
+		routes.forEach(function(route){
+			elevationService.getElevationAlongPath({
+				'path':route.overview_path,
+				'samples': 100    //Don't know what the limit is for samples.  seems to be flat, which means longer paths will have lower accuracy
+			},showElevation);
+		});
+	}
+	function showElevation(elevations, status){
+		if(status!=='OK'){
+			document.getElementById('topography').appendChild(document.createElement("p").innerHTML=("Elevation Failed: "+status));
+			return;
+		}
+		var chartContainer = document.createElement("div");
+		document.getElementById('topography').appendChild(chartContainer);
+		var chart = new google.visualization.LineChart(chartContainer);
+
+		var data = new google.visualization.DataTable();
+ 		data.addColumn('string', 'Sample');
+ 		data.addColumn('number', 'Elevation');
+ 		for (var i = 0; i < elevations.length; i++) {
+	 		data.addRow(['', elevations[i].elevation]);
+ 		}
+
+		chart.draw(data, {
+    	height: 150,
+    	legend: 'none',
+    	titleY: 'Elevation (m)',
+			curveType: 'function'
+  	});
+
 	}
 	function getLocation() {
 	    if (navigator.geolocation) {
@@ -36,6 +76,7 @@
     function initMap() {
 				directionsService= new google.maps.DirectionsService;
 				directionsDisplay= new google.maps.DirectionsRenderer;
+				elevationService= new google.maps.ElevationService;
 				var position = getLocation();
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 18,
@@ -69,6 +110,7 @@
         }, function(response, status) {
           if (status === 'OK') {
 							directionsDisplay.setDirections(response);
+							getTopography(response.routes);
           } else {
             window.alert('Directions request failed due to ' + status);
           }

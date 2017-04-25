@@ -11,7 +11,7 @@ response{
     types[]
   }
   routes[]{
-    Legs[]{
+    legs[]{
       steps[]{
 
       }
