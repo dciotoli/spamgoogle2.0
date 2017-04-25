@@ -33,7 +33,7 @@
 		initMap();
 	}
 	function getTopography(routes){
-		document.getElementById('topography').innerHTML = ""; //Reset Div
+		document.getElementById('topography').empty(); //Reset Div
 		routes.forEach(function(route){
 			elevationService.getElevationAlongPath({
 				'path':route.overview_path,
