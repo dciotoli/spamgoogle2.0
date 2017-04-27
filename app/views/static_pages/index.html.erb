@@ -29,6 +29,7 @@
 	var currLocation;
 	var elevationService;
 	var lastRequest;
+	var tempID;
 	function saveLocation(position){
 		currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
 		initMap();
@@ -38,6 +39,7 @@
 		while(topographyDiv.firstChild){
 			topographyDiv.firstChild.remove();
 		}
+		tempID=0;
 		routes.forEach(function(route){
 			elevationService.getElevationAlongPath({
 				'path':route.overview_path,
@@ -52,6 +54,8 @@
 			return;
 		} else if(status==='OK'){
 			var chartContainer = document.createElement("div");
+			chartContainer.setAttribute("data-route-index",tempID);
+			//chartContainer.setAttribute()
 			document.getElementById('topography').appendChild(chartContainer);
 			var chart = new google.visualization.LineChart(chartContainer);
 
@@ -68,6 +72,7 @@
 				titleY: 'Elevation (m)',
 				curveType: 'function'
 			});
+			tempID++;
 		}
 	}
 	function getLocation() {
@@ -93,7 +98,7 @@
 		});
 		directionsDisplay.setMap(map);
 		directionsDisplay.setPanel(document.getElementById("directions"));
-		
+
 		var onChangeHandler = function() {
 			calculateAndDisplayRoute();
 		};
@@ -106,6 +111,9 @@
 		var end=document.getElementById('end').value;
 		if(start === "Current Location"){
 			start = currLocation;
+		}
+		if(end === "Current Location"){
+			end = currLocation;
 		}
 		directionsService.route({
 			origin: start,
