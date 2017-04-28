@@ -14,7 +14,7 @@
 		</div>
 		<div id="directions">
 		</div>
-		<div onclick="getTopography(lastRequest.routes)" id="topography">
+		<div id="topography">
 		</div>
 	</div>
 
@@ -30,14 +30,15 @@
 	var elevationService;
 	var lastRequest;
 	var tempID;
+	var charts=[];
 	function saveLocation(position){
 		currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
 		initMap();
 	}
 	function getTopography(routes){
 		var topographyDiv=document.getElementById('topography');
-		while(topographyDiv.firstChild){
-			topographyDiv.firstChild.remove();
+		while(charts.length){
+			charts.pop().remove();
 		}
 		tempID=0;
 		routes.forEach(function(route){
@@ -53,11 +54,10 @@
 			document.getElementById('topography').appendChild(error);
 			return;
 		} else if(status==='OK'){
-			var chartContainer = document.createElement("div");
-			chartContainer.setAttribute("data-route-index",tempID);
-			//chartContainer.setAttribute()
-			document.getElementById('topography').appendChild(chartContainer);
+			var chartContainer = document.createElement('div');
+			document.getElementsByClassName('adp-listinfo')[tempID].appendChild(chartContainer);
 			var chart = new google.visualization.LineChart(chartContainer);
+			charts.push(chartContainer);
 
 			var data = new google.visualization.DataTable();
 			data.addColumn('string', 'Sample');
@@ -102,6 +102,10 @@
 		var onChangeHandler = function() {
 			calculateAndDisplayRoute();
 		};
+		document.getElementById('directions').addEventListener('change',function(){
+			getTopography(lastRequest);
+			console.log('test');
+		});
 		document.getElementById('start').addEventListener('change', onChangeHandler);
 		document.getElementById('end').addEventListener('change', onChangeHandler);
 	}
