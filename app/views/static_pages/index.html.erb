@@ -111,6 +111,10 @@
 	}
 
 	function calculateAndDisplayRoute() {
+		var panel=document.getElementById("directions");
+		while(panel.firstChild){
+			panel.firstChild.remove();
+		}
 		var start=document.getElementById('start').value;
 		var end=document.getElementById('end').value;
 		if(start === "Current Location"){
