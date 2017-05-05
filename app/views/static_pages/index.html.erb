@@ -18,6 +18,7 @@
 	var map;
 	var directionsService;
 	var directionsDisplay;
+	var routeArr = [];
 	var currLocation;
 	function saveLocation(position){
 		currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
@@ -31,10 +32,14 @@
 	        x.innerHTML = "Geolocation is not supported by this browser.";
 	    }
 	}
-
+	function removeRoutes() {
+		for (var i = 0, len = routeArr.length; i < len; i++) {
+			routeArr[i].setMap(null);
+		}
+	}
     function initMap() {
-				directionsService= new google.maps.DirectionsService;
-				directionsDisplay= new google.maps.DirectionsRenderer;
+				directionsService = new google.maps.DirectionsService;
+				directionsDisplay = new google.maps.DirectionsRenderer;
 				var position = getLocation();
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 18,
@@ -45,17 +50,22 @@
           map: map
         });
 				directionsDisplay.setMap(map);
-
-				var onChangeHandler = function() {
+		
+		var onChangeHandler = function() {
           calculateAndDisplayRoute();
         };
+
         document.getElementById('start').addEventListener('change', onChangeHandler);
         document.getElementById('end').addEventListener('change', onChangeHandler);
+        
+        // get input element
+
       }
 
 		function calculateAndDisplayRoute() {
 			var start=document.getElementById('start').value;
 			var end=document.getElementById('end').value;
+			removeRoutes();
 			if(start === "Current Location"){
 				start = currLocation;
 			}
@@ -68,12 +78,12 @@
           if (status === 'OK') {
 						var routesSteps=[];
 						var routes=response.routes;
-	          var colors = ['red', 'green', 'blue'];
-						for (var i=0;i<routes.length;i++){
+	         var colors = ['red', 'green', 'blue'];
+			for (var i=0;i<routes.length;i++){
 
-							directionsDisplay.setDirections(response);
+				//directionsDisplay.setDirections(response);
 
-                new google.maps.DirectionsRenderer({
+                routeArr[i] = new google.maps.DirectionsRenderer({
                     map: map,
                     directions: response,
                     routeIndex: i,
@@ -81,9 +91,9 @@
 
                         strokeColor: colors[i],
                         strokeWeight: 4,
-                        strokeOpacity: .3
+                        strokeOpacity: .4
                     }
-                });
+                }); 
 
                 var steps = routes[i].legs[0].steps;
                 var stepsCoords = [];
