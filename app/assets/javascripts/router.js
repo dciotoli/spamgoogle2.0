@@ -20,12 +20,14 @@ var currLocation;
 var elevationService;
 var lastRequest;
 var tempID;
+var ratings=[];
 var charts=[];
 function saveLocation(position){
   currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
   initMap();
 }
 function getTopography(routes){
+  ratings=[];
   var topographyDiv=document.getElementById('topography');
   while(charts.length){
     charts.pop().remove();
@@ -44,8 +46,10 @@ function showElevation(elevations, status){
     document.getElementById('topography').appendChild(error);
     return;
   } else if(status==='OK'){
+    var numChilds = document.getElementsByClassName('adp-listinfo')[tempID].childNodes.length;
+    var ttemp = document.getElementsByClassName('adp-listinfo')[tempID].childNodes[numChilds-1];
     var chartContainer = document.createElement('div');
-    document.getElementsByClassName('adp-listinfo')[tempID].appendChild(chartContainer);
+    document.getElementsByClassName('adp-listinfo')[tempID].insertBefore(chartContainer,ttemp);
     var chart = new google.visualization.LineChart(chartContainer);
     charts.push(chartContainer);
 
@@ -55,7 +59,9 @@ function showElevation(elevations, status){
     for (var i = 0; i < elevations.length; i++) {
       data.addRow(['', elevations[i].elevation]);
     }
-    data.addRow(['',rating(elevations)/100]);
+    ratings.push(rating(elevations)/100);
+    ttemp = document.getElementsByClassName('adp-listinfo')[tempID].childNodes[numChilds-2];
+    ttemp.innerHTML+=" <b>Elevation Rating: </b>"+ratings[tempID].toFixed(3);
 
     chart.draw(data, {
       height: 150,

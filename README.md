@@ -1,6 +1,15 @@
 # spamgoogle2.0
 
 
+5-9
+Rating formula complete:
+uphill = difference^2  (larger changes are worse, smaller changes are less worse)
+downhill = 0
+
+Hide elevation chart, show on click. (popup)
+Color route names to indicate ranking (green, blue, red).
+
+
 4-25
 Topography is done
 Features to add:
