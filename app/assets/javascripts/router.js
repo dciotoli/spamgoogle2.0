@@ -28,23 +28,16 @@ function saveLocation(position){
   initMap();
 }
 function getTopography(){
-  if(tempID==0){
-    ratings=[];
-    datas=[];
-    while(espans.length){
-      espans.pop().remove();
-    }
-  }
   console.log(lastRequest.routes.length);
   console.log(tempID);
   if(tempID>=lastRequest.routes.length){
     tempID=0;
-    return;
-  }
+  }else{
   elevationService.getElevationAlongPath({
     'path':lastRequest.routes[tempID].overview_path,
     'samples': 100    //Don't know what the limit is for samples.  seems to be flat, which means longer paths will have lower accuracy
   },showElevation);
+}
 }
 function showElevation(elevations, status){
   if(status!=='OK'){
@@ -52,8 +45,12 @@ function showElevation(elevations, status){
     document.getElementById('dynamic').appendChild(error);
     return;
   } else if(status==='OK'){
-    var numChilds = document.getElementsByClassName('adp-listinfo')[tempID].childNodes.length;
-    var ttemp = document.getElementsByClassName('adp-listinfo')[tempID].childNodes[numChilds-1];
+    var adp=document.getElementsByClassName('adp-listinfo');
+    if(lastRequest.routes.length>0){
+      adp=adp[tempID];
+    }
+    var numChilds = adp.childNodes.length;
+    var ttemp = adp.childNodes[numChilds-1];
 
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Sample');
@@ -65,7 +62,7 @@ function showElevation(elevations, status){
 
 
     ratings.push(rating(elevations)/100);
-    ttemp = document.getElementsByClassName('adp-listinfo')[tempID].childNodes[numChilds-2];
+    ttemp = adp.childNodes[numChilds-2];
     var espan = document.createElement('span');
     espan.innerHTML=" <b>Elevation Rating: </b>"+ratings[tempID].toFixed(3);
     espan.setAttribute("data-toggle","modal");
@@ -127,6 +124,11 @@ function initMap() {
 }
 
 function calculateAndDisplayRoute() {
+      ratings=[];
+      datas=[];
+      while(espans.length>0){
+        espans.pop().remove();
+      }
   var panel=document.getElementsByClassName("Panel");
   while(panel[0]){
     panel[0].remove();
