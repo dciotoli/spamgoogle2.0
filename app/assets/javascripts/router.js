@@ -28,7 +28,7 @@ function saveLocation(position){
   initMap();
 }
 function getTopography(){
-  if(tempID==-1){
+  if(tempID==0){
     ratings=[];
     datas=[];
     while(espans.length){
