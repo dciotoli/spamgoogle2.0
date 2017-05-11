@@ -2,7 +2,7 @@ function rating(data){
   var sumIncline=0;
   for(i = 1;i<data.length;i++){
     if(data[i].elevation - data[i-1].elevation>0){
-      sumIncline+=Math.pow(data[i].elevation-data[i-1].elevation,2);
+      sumIncline+=Math.pow((data[i].elevation-data[i-1].elevation)*6,2);
     }
   }
   return sumIncline;
@@ -19,24 +19,32 @@ var directionsDisplay;
 var currLocation;
 var elevationService;
 var lastRequest;
-var tempID;
+var tempID=0;
 var ratings=[];
 var datas=[];
+var espans=[];
 function saveLocation(position){
   currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
   initMap();
 }
-function getTopography(routes){
-  ratings=[];
-  datas=[];
-  var topographyDiv=document.getElementById('topography');
-  tempID=-1;
-  routes.forEach(function(route){
-    elevationService.getElevationAlongPath({
-      'path':route.overview_path,
-      'samples': 100    //Don't know what the limit is for samples.  seems to be flat, which means longer paths will have lower accuracy
-    },showElevation);
-  });
+function getTopography(){
+  if(tempID==-1){
+    ratings=[];
+    datas=[];
+    while(espans.length){
+      espans.pop().remove();
+    }
+  }
+  console.log(lastRequest.routes.length);
+  console.log(tempID);
+  if(tempID>=lastRequest.routes.length){
+    tempID=0;
+    return;
+  }
+  elevationService.getElevationAlongPath({
+    'path':lastRequest.routes[tempID].overview_path,
+    'samples': 100    //Don't know what the limit is for samples.  seems to be flat, which means longer paths will have lower accuracy
+  },showElevation);
 }
 function showElevation(elevations, status){
   if(status!=='OK'){
@@ -44,7 +52,6 @@ function showElevation(elevations, status){
     document.getElementById('dynamic').appendChild(error);
     return;
   } else if(status==='OK'){
-    tempID++;
     var numChilds = document.getElementsByClassName('adp-listinfo')[tempID].childNodes.length;
     var ttemp = document.getElementsByClassName('adp-listinfo')[tempID].childNodes[numChilds-1];
 
@@ -66,7 +73,9 @@ function showElevation(elevations, status){
     espan.setAttribute("href","#elevationChart");
     espan.setAttribute("onClick","drawModal("+tempID+")");
     ttemp.appendChild(espan);
-    espan.onC
+    espans.push(espan);
+    tempID++;
+    getTopography();
   }
 }
 function drawModal(index){
@@ -75,6 +84,7 @@ function drawModal(index){
     body.childNodes[0].remove();
   }
   var chartContainer = document.createElement('div');
+  chartContainer.width = $('#modal-body').parent().parent().width() - 50;
   body.appendChild(chartContainer);
   var chart = new google.visualization.LineChart(chartContainer);
   chart.draw(datas[index], {
@@ -142,7 +152,7 @@ function calculateAndDisplayRoute() {
     if (status === 'OK') {
       lastRequest=response;
       directionsDisplay.setDirections(lastRequest);
-      getTopography(lastRequest.routes);
+      getTopography();
     } else {
       window.alert('Directions request failed due to ' + status);
     }
