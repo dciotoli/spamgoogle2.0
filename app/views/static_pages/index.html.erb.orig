@@ -1,0 +1,218 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<h3 class="text-center">My Bike Path Router</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div id="map"></div>
+		<div id="floating-panel">
+			<b>Start: </b>
+			<input type="text" id="start" class ="form-control" value="Current Location">
+			<b>End: </b>
+			<input type="text" id="end" class="form-control">
+		</div>
+		<div id="directions">
+		</div>
+		<div id="topography">
+		</div>
+	</div>
+
+	<script src="https://www.google.com/jsapi"></script>
+	<script>
+
+	google.load('visualization', '1', {packages: ['linechart']});
+
+	var map;
+	var directionsService;
+	var directionsDisplay;
+	var routeArr = [];
+	var currLocation;
+	var elevationService;
+	var lastRequest;
+	var tempID;
+	var charts=[];
+	function saveLocation(position){
+		currLocation= {lat: position.coords.latitude, lng: position.coords.longitude};
+		initMap();
+	}
+	function getTopography(routes){
+		var topographyDiv=document.getElementById('topography');
+		while(charts.length){
+			charts.pop().remove();
+		}
+		tempID=0;
+		routes.forEach(function(route){
+			elevationService.getElevationAlongPath({
+				'path':route.overview_path,
+				'samples': 100    //Don't know what the limit is for samples.  seems to be flat, which means longer paths will have lower accuracy
+			},showElevation);
+		});
+	}
+<<<<<<< HEAD
+	function removeRoutes() {
+		for (var i = 0, len = routeArr.length; i < len; i++) {
+			routeArr[i].setMap(null);
+		}
+	}
+    function initMap() {
+				directionsService = new google.maps.DirectionsService;
+				directionsDisplay = new google.maps.DirectionsRenderer;
+				var position = getLocation();
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 18,
+          center: currLocation
+        });
+        var marker = new google.maps.Marker({
+          position: currLocation,
+          map: map
+        });
+				directionsDisplay.setMap(map);
+		
+		var onChangeHandler = function() {
+          calculateAndDisplayRoute();
+        };
+
+        document.getElementById('start').addEventListener('change', onChangeHandler);
+        document.getElementById('end').addEventListener('change', onChangeHandler);
+        
+        // get input element
+
+      }
+
+		function calculateAndDisplayRoute() {
+			var start=document.getElementById('start').value;
+			var end=document.getElementById('end').value;
+			removeRoutes();
+			if(start === "Current Location"){
+				start = currLocation;
+			}
+        directionsService.route({
+          origin: start,
+          destination: end,
+          travelMode: 'BICYCLING',
+					provideRouteAlternatives: true
+        }, function(response, status) {
+          if (status === 'OK') {
+						var routesSteps=[];
+						var routes=response.routes;
+	         var colors = ['red', 'green', 'blue'];
+			for (var i=0;i<routes.length;i++){
+
+				//directionsDisplay.setDirections(response);
+
+                routeArr[i] = new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: response,
+                    routeIndex: i,
+                    polylineOptions: {
+
+                        strokeColor: colors[i],
+                        strokeWeight: 4,
+                        strokeOpacity: .4
+                    }
+                }); 
+
+                var steps = routes[i].legs[0].steps;
+                var stepsCoords = [];
+
+                for (var j = 0; j < steps.length; j++) {
+
+                    stepsCoords[j] = new google.maps.LatLng(steps[j].start_location.lat(), steps[j].start_location.lng());
+=======
+	function showElevation(elevations, status){
+		if(status!=='OK'){
+			var error=document.createElement("p");
+			document.getElementById('topography').appendChild(error);
+			return;
+		} else if(status==='OK'){
+			var chartContainer = document.createElement('div');
+			document.getElementsByClassName('adp-listinfo')[tempID].appendChild(chartContainer);
+			var chart = new google.visualization.LineChart(chartContainer);
+			charts.push(chartContainer);
+
+			var data = new google.visualization.DataTable();
+			data.addColumn('string', 'Sample');
+			data.addColumn('number', 'Elevation');
+			for (var i = 0; i < elevations.length; i++) {
+				data.addRow(['', elevations[i].elevation]);
+			}
+
+			chart.draw(data, {
+				height: 150,
+				legend: 'none',
+				titleY: 'Elevation (m)',
+				curveType: 'function'
+			});
+			tempID++;
+		}
+	}
+	function getLocation() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(saveLocation);
+		} else {
+			x.innerHTML = "Geolocation is not supported by this browser.";
+		}
+	}
+>>>>>>> refs/remotes/origin/master
+
+	function initMap() {
+		directionsService= new google.maps.DirectionsService;
+		directionsDisplay= new google.maps.DirectionsRenderer;
+		elevationService= new google.maps.ElevationService;
+		var position = getLocation();
+		map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 18,
+			center: currLocation
+		});
+		var marker = new google.maps.Marker({
+			position: currLocation,
+			map: map
+		});
+		directionsDisplay.setMap(map);
+		directionsDisplay.setPanel(document.getElementById("directions"));
+
+		var onChangeHandler = function() {
+			calculateAndDisplayRoute();
+		};
+		document.getElementById('directions').addEventListener('change',function(){
+			getTopography(lastRequest);
+			console.log('test');
+		});
+		document.getElementById('start').addEventListener('change', onChangeHandler);
+		document.getElementById('end').addEventListener('change', onChangeHandler);
+	}
+
+	function calculateAndDisplayRoute() {
+		var panel=document.getElementById("directions");
+		while(panel.firstChild){
+			panel.firstChild.remove();
+		}
+		var start=document.getElementById('start').value;
+		var end=document.getElementById('end').value;
+		if(start === "Current Location"){
+			start = currLocation;
+		}
+		if(end === "Current Location"){
+			end = currLocation;
+		}
+		directionsService.route({
+			origin: start,
+			destination: end,
+			travelMode: 'BICYCLING',
+			provideRouteAlternatives: true
+		}, function(response, status) {
+			if (status === 'OK') {
+				lastRequest=response;
+				directionsDisplay.setDirections(lastRequest);
+				getTopography(lastRequest.routes);
+			} else {
+				window.alert('Directions request failed due to ' + status);
+			}
+		});
+	}
+	</script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5r5234G4KwLjTkmJ2Fa9y-8NkqavSjEM&callback=getLocation">
+	</script>
+
+</div>
